@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>💕 Letter for Antel Hayat · Kharoos</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -246,7 +246,7 @@
       font-weight: 400;
       cursor: pointer;
       backdrop-filter: blur(4px);
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -255,13 +255,16 @@
       justify-content: center;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      position: relative;
+      z-index: 10;
     }
 
-    .nav-btn i { font-size: 0.85rem; color: #ff8a8a; }
+    .nav-btn i { font-size: 0.85rem; color: #ff8a8a; pointer-events: none; }
 
     .nav-btn:active {
       transform: scale(0.92);
-      background: rgba(255, 140, 140, 0.2);
+      background: rgba(255, 140, 140, 0.25);
     }
 
     .nav-btn:disabled { opacity: 0.3; pointer-events: none; filter: grayscale(0.5); }
@@ -530,6 +533,7 @@
     .open-btn:active { transform: translateX(-50%) scale(0.95); }
     .open-btn.hidden { opacity: 0; pointer-events: none; }
 
+    /* ===== ANSWER BOX - FIXED FOR KEYBOARD ===== */
     .answer-section {
       width: 100%;
       max-width: 400px;
@@ -538,20 +542,28 @@
       flex-direction: column;
       align-items: center;
       gap: 0.4rem;
+      position: relative;
+      z-index: 5;
     }
 
     .answer-box {
       width: 100%;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1rem;
       border-radius: 60px;
       border: 1px solid rgba(255, 180, 180, 0.25);
       background: rgba(255, 220, 220, 0.05);
       backdrop-filter: blur(4px);
       color: #f5e6e6;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-family: inherit;
       transition: all 0.3s ease;
       outline: none;
+      -webkit-user-select: text !important;
+      user-select: text !important;
+      touch-action: manipulation;
+      z-index: 10;
+      position: relative;
+      caret-color: #ff6b81;
     }
 
     .answer-box::placeholder {
@@ -581,11 +593,8 @@
       gap: 6px;
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 8px 20px rgba(214, 40, 74, 0.4);
-    }
-
-    .reply-btn:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #ff5a7a, #e02a4e);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .reply-btn:active { transform: scale(0.95); }
@@ -665,11 +674,7 @@
       box-shadow: 0 10px 35px rgba(192, 57, 43, 0.5);
       margin-top: 0.1rem;
       touch-action: manipulation;
-    }
-
-    .accept-btn:hover {
-      transform: scale(1.08);
-      background: linear-gradient(135deg, #ff7b8f, #d44637);
+      -webkit-tap-highlight-color: transparent;
     }
 
     .accept-btn:active { transform: scale(0.95); }
@@ -731,12 +736,6 @@
       pointer-events: auto;
     }
 
-    .continue-btn:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #5cb860, #388e3c);
-      box-shadow: 0 12px 35px rgba(46, 125, 50, 0.6);
-    }
-
     .continue-btn:active { transform: scale(0.95); }
 
     .restart-section {
@@ -762,11 +761,7 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 8px 25px rgba(192, 57, 43, 0.5);
       touch-action: manipulation;
-    }
-
-    .restart-btn:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #ff7b8f, #d44637);
+      -webkit-tap-highlight-color: transparent;
     }
 
     .restart-btn:active { transform: scale(0.95); }
@@ -844,11 +839,11 @@
       .page-body { font-size: 0.95rem; }
       .page-icon { font-size: 2.2rem; }
       .page-indicator { font-size: 0.7rem; padding: 0.2rem 0.7rem; }
-      .nav-btn { padding: 0.4rem 0.8rem; font-size: 0.75rem; min-width: 55px; }
+      .nav-btn { padding: 0.45rem 0.8rem; font-size: 0.75rem; min-width: 55px; }
       .nav-btn i { font-size: 0.75rem; }
       .nav-header { gap: 0.3rem; }
       .big-emoji { font-size: 3rem; }
-      .answer-box { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+      .answer-box { font-size: 0.85rem; padding: 0.5rem 0.8rem; }
       .reply-btn { font-size: 0.8rem; padding: 0.35rem 1.2rem; }
       .restart-btn { font-size: 0.8rem; padding: 0.35rem 1.2rem; }
       .accept-btn { font-size: 0.85rem; padding: 0.5rem 1.3rem; }
@@ -874,7 +869,7 @@
       .book { padding: 0.6rem 0.4rem 0.8rem 0.4rem; }
       .nav-header { flex-wrap: wrap; justify-content: center; gap: 0.3rem; }
       .page-indicator { font-size: 0.6rem; padding: 0.15rem 0.6rem; }
-      .nav-btn { padding: 0.35rem 0.6rem; font-size: 0.65rem; min-width: 50px; }
+      .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.65rem; min-width: 50px; }
       .nav-btn i { font-size: 0.65rem; }
       .page-title { font-size: 1.1rem; }
       .page-body { font-size: 0.85rem; }
@@ -890,6 +885,7 @@
       .surprise-message-box { padding: 1rem; }
       .surprise-message-box h1 { font-size: 1.3rem; }
       .surprise-close-btn { font-size: 0.85rem; padding: 0.5rem 1.2rem; }
+      .answer-box { font-size: 0.8rem; padding: 0.4rem 0.7rem; }
     }
   </style>
 </head>
@@ -1067,8 +1063,8 @@
 
     // DOM refs
     const container = document.getElementById('pageContainer');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+    let prevBtn = document.getElementById('prevBtn');
+    let nextBtn = document.getElementById('nextBtn');
     const pageCounter = document.getElementById('pageCounter');
 
     let currentIndex = 0;
@@ -1201,7 +1197,8 @@
             <div class="answer-section">
               <input type="text" class="answer-box" id="answerInput" 
                      placeholder="✍️ Write your answer here, cutie..." 
-                     value="${savedAnswer}" autocomplete="off">
+                     value="${savedAnswer}" autocomplete="off" 
+                     inputmode="text" enterkeyhint="send">
               <button class="reply-btn" id="replyBtn">
                 <i class="fas fa-paper-plane"></i> Reply
               </button>
@@ -1235,12 +1232,17 @@
 
       container.innerHTML = html;
       pageCounter.textContent = `${index+1} / ${totalPages}`;
-      prevBtn.disabled = (index === 0);
+      
+      // Get fresh button references
+      prevBtn = document.getElementById('prevBtn');
+      nextBtn = document.getElementById('nextBtn');
+      
+      if (prevBtn) prevBtn.disabled = (index === 0);
       
       if (isLastPage) {
-        nextBtn.disabled = !flowersAccepted;
+        if (nextBtn) nextBtn.disabled = !flowersAccepted;
       } else {
-        nextBtn.disabled = false;
+        if (nextBtn) nextBtn.disabled = false;
       }
 
       // Letter open functionality
@@ -1254,7 +1256,7 @@
             envelope.classList.add('open');
             openBtn.classList.add('hidden');
             isLetterOpen = true;
-            nextBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
           });
 
           envelope.addEventListener('click', function(e) {
@@ -1262,7 +1264,7 @@
               envelope.classList.add('open');
               openBtn.classList.add('hidden');
               isLetterOpen = true;
-              nextBtn.disabled = false;
+              if (nextBtn) nextBtn.disabled = false;
             }
           });
         }
@@ -1275,25 +1277,37 @@
         const feedback = document.getElementById('replyFeedback');
 
         if (replyBtn && answerInput) {
-          replyBtn.addEventListener('click', function() {
+          // Remove any existing listeners
+          const newReplyBtn = replyBtn.cloneNode(true);
+          replyBtn.parentNode.replaceChild(newReplyBtn, replyBtn);
+          
+          newReplyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             const answer = answerInput.value.trim();
             if (answer) {
               userAnswers[index] = answer;
-              feedback.textContent = '💕 Kharoos got your reply! 💕';
-              feedback.classList.add('show');
-              setTimeout(() => feedback.classList.remove('show'), 2500);
-            } else {
-              feedback.textContent = '💋 Write something, cutie!';
-              feedback.classList.add('show');
-              setTimeout(() => {
+              if (feedback) {
                 feedback.textContent = '💕 Kharoos got your reply! 💕';
-                feedback.classList.remove('show');
-              }, 2000);
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2500);
+              }
+            } else {
+              if (feedback) {
+                feedback.textContent = '💋 Write something, cutie!';
+                feedback.classList.add('show');
+                setTimeout(() => {
+                  feedback.textContent = '💕 Kharoos got your reply! 💕';
+                  feedback.classList.remove('show');
+                }, 2000);
+              }
             }
           });
 
           answerInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') replyBtn.click();
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              newReplyBtn.click();
+            }
           });
 
           answerInput.addEventListener('input', function() {
@@ -1336,7 +1350,8 @@
               setTimeout(function() {
                 const contBtn = document.getElementById('continueBtn');
                 if (contBtn) contBtn.classList.add('show');
-                nextBtn.disabled = false;
+                const nxtBtn = document.getElementById('nextBtn');
+                if (nxtBtn) nxtBtn.disabled = false;
               }, 1200);
               
               setTimeout(function() {
@@ -1357,7 +1372,8 @@
                 feedback.textContent = '💕 Thank you for accepting! You made Kharoos so happy! 💕';
                 feedback.classList.add('show');
               }
-              nextBtn.disabled = false;
+              const nxtBtn = document.getElementById('nextBtn');
+              if (nxtBtn) nxtBtn.disabled = false;
             });
           }
 
@@ -1376,6 +1392,9 @@
         }, 50);
       }
 
+      // Re-attach navigation events after render
+      setTimeout(attachNavEvents, 100);
+      
       document.querySelector('.book').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
@@ -1385,11 +1404,12 @@
       renderPage(currentIndex);
     }
 
-    // ===== SIMPLIFIED NAVIGATION WITH FORCED CLICK HANDLING =====
+    // ===== NAVIGATION EVENTS =====
     function handleNextClick(e) {
-      if (e) { e.preventDefault(); e.stopPropagation(); }
-      
-      console.log('Next button clicked! Current index:', currentIndex, 'Total pages:', totalPages);
+      if (e) { 
+        e.preventDefault(); 
+        e.stopPropagation(); 
+      }
       
       // If on letter page and letter not open
       if (currentIndex === 0 && !isLetterOpen) {
@@ -1399,10 +1419,10 @@
           envelope.classList.add('open');
           if (openBtn) openBtn.classList.add('hidden');
           isLetterOpen = true;
-          nextBtn.disabled = false;
+          const nxtBtn = document.getElementById('nextBtn');
+          if (nxtBtn) nxtBtn.disabled = false;
           setTimeout(function() {
             if (currentIndex < totalPages - 1) {
-              console.log('Opening letter, then going to page:', currentIndex + 1);
               goToPage(currentIndex + 1);
             }
           }, 500);
@@ -1427,7 +1447,6 @@
       
       // Normal navigation - go to next page
       if (currentIndex < totalPages - 1) {
-        console.log('Navigating to page:', currentIndex + 1);
         goToPage(currentIndex + 1);
       }
     }
@@ -1435,53 +1454,41 @@
     function handlePrevClick(e) {
       if (e) { e.preventDefault(); e.stopPropagation(); }
       if (currentIndex > 0) {
-        console.log('Going back to page:', currentIndex - 1);
         goToPage(currentIndex - 1);
       }
     }
 
-    // Attach click events with multiple methods for reliability
     function attachNavEvents() {
-      // Remove any existing listeners by cloning
-      const prevClone = prevBtn.cloneNode(true);
-      const nextClone = nextBtn.cloneNode(true);
-      prevBtn.parentNode.replaceChild(prevClone, prevBtn);
-      nextBtn.parentNode.replaceChild(nextClone, nextBtn);
+      prevBtn = document.getElementById('prevBtn');
+      nextBtn = document.getElementById('nextBtn');
       
-      // Get fresh references
-      const newPrevBtn = document.getElementById('prevBtn');
-      const newNextBtn = document.getElementById('nextBtn');
+      if (prevBtn) {
+        const newPrev = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+        newPrev.addEventListener('click', handlePrevClick);
+        newPrev.addEventListener('touchstart', function(e) {
+          // Only prevent if it's a touch event
+          if (e.type === 'touchstart') {
+            e.preventDefault();
+          }
+          handlePrevClick(e);
+        }, { passive: false });
+        prevBtn = newPrev;
+      }
       
-      // Attach events
-      newPrevBtn.addEventListener('click', handlePrevClick);
-      newNextBtn.addEventListener('click', handleNextClick);
-      
-      // Also attach touch events for mobile
-      newPrevBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        handlePrevClick(e);
-      }, { passive: false });
-      
-      newNextBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        handleNextClick(e);
-      }, { passive: false });
-      
-      // Store references
-      window.prevBtnRef = newPrevBtn;
-      window.nextBtnRef = newNextBtn;
+      if (nextBtn) {
+        const newNext = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNext, nextBtn);
+        newNext.addEventListener('click', handleNextClick);
+        newNext.addEventListener('touchstart', function(e) {
+          if (e.type === 'touchstart') {
+            e.preventDefault();
+          }
+          handleNextClick(e);
+        }, { passive: false });
+        nextBtn = newNext;
+      }
     }
-
-    // Override renderPage to reattach events after rendering
-    const originalRender = renderPage;
-    renderPage = function(index) {
-      originalRender(index);
-      // Reattach navigation events after page renders
-      setTimeout(attachNavEvents, 100);
-    };
-
-    // Initial attachment
-    setTimeout(attachNavEvents, 200);
 
     // Keyboard support
     document.addEventListener('keydown', function(e) {
