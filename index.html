@@ -616,6 +616,47 @@
 
     .reply-feedback.show { opacity: 1; }
 
+    /* ===== MOBILE NEXT BUTTON ===== */
+    .mobile-next-section {
+      width: 100%;
+      max-width: 400px;
+      margin: 0.5rem auto 0.2rem auto;
+      display: none;
+      justify-content: center;
+    }
+
+    .mobile-next-btn {
+      background: linear-gradient(135deg, #ff6b81, #d6284a);
+      border: none;
+      border-radius: 60px;
+      padding: 0.7rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff5f5;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 25px rgba(214, 40, 74, 0.4);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 10;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .mobile-next-btn:active { transform: scale(0.95); }
+    .mobile-next-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+    /* Mobile only - show extra next button */
+    @media (max-width: 768px) {
+      .mobile-next-section {
+        display: flex !important;
+      }
+    }
+
     .flower-section {
       width: 100%;
       margin: 0.3rem auto;
@@ -871,6 +912,7 @@
       .continue-btn { font-size: 0.8rem; padding: 0.4rem 1.2rem; }
       .github-corner svg { width: 45px; height: 45px; }
       .page-container { min-height: 220px; }
+      .mobile-next-btn { font-size: 1rem; padding: 0.6rem 2rem; }
     }
 
     @media (max-width: 400px) {
@@ -894,6 +936,7 @@
       .surprise-message-box h1 { font-size: 1.3rem; }
       .surprise-close-btn { font-size: 0.85rem; padding: 0.5rem 1.2rem; }
       .answer-box { font-size: 0.8rem; padding: 0.4rem 0.7rem; }
+      .mobile-next-btn { font-size: 0.9rem; padding: 0.5rem 1.5rem; }
     }
   </style>
 </head>
@@ -1242,6 +1285,18 @@
         `;
       }
 
+      // Mobile next button HTML - for ALL pages except last
+      let mobileNextHtml = '';
+      if (!isLastPage) {
+        mobileNextHtml = `
+          <div class="mobile-next-section">
+            <button class="mobile-next-btn" id="mobileNextBtn">
+              <i class="fas fa-arrow-right"></i> Next Page <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        `;
+      }
+
       const html = `
         <div class="page-content">
           <div class="page-icon">${iconHtml}</div>
@@ -1265,6 +1320,8 @@
               </div>
             </div>
           ` : ''}
+          
+          ${mobileNextHtml}
           
           ${isLastPage ? flowerHtml : ''}
           
@@ -1294,10 +1351,10 @@
       // Get button references
       const prevBtn = document.getElementById('prevBtn');
       const nextBtn = document.getElementById('nextBtn');
+      const mobileNextBtn = document.getElementById('mobileNextBtn');
       
       if (prevBtn) {
         prevBtn.disabled = (index === 0);
-        // Remove old listeners and add new ones
         const newPrev = prevBtn.cloneNode(true);
         prevBtn.parentNode.replaceChild(newPrev, prevBtn);
         newPrev.addEventListener('click', handlePrevClick);
@@ -1309,10 +1366,16 @@
         } else {
           nextBtn.disabled = false;
         }
-        // Remove old listeners and add new ones
         const newNext = nextBtn.cloneNode(true);
         nextBtn.parentNode.replaceChild(newNext, nextBtn);
         newNext.addEventListener('click', handleNextClick);
+      }
+
+      // Mobile Next Button - for ALL pages except last
+      if (mobileNextBtn) {
+        const newMobileNext = mobileNextBtn.cloneNode(true);
+        mobileNextBtn.parentNode.replaceChild(newMobileNext, mobileNextBtn);
+        newMobileNext.addEventListener('click', handleNextClick);
       }
 
       // Letter open functionality
@@ -1321,7 +1384,6 @@
         const envelope = document.getElementById('envelope');
 
         if (openBtn && envelope) {
-          // Remove old listeners
           const newOpenBtn = openBtn.cloneNode(true);
           openBtn.parentNode.replaceChild(newOpenBtn, openBtn);
           
@@ -1354,7 +1416,6 @@
         const feedback = document.getElementById('replyFeedback');
 
         if (replyBtn && answerInput) {
-          // Remove old listeners
           const newReplyBtn = replyBtn.cloneNode(true);
           replyBtn.parentNode.replaceChild(newReplyBtn, replyBtn);
           
