@@ -257,7 +257,8 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       position: relative;
-      z-index: 10;
+      z-index: 20;
+      pointer-events: auto !important;
     }
 
     .nav-btn i { font-size: 0.85rem; color: #ff8a8a; pointer-events: none; }
@@ -267,7 +268,11 @@
       background: rgba(255, 140, 140, 0.25);
     }
 
-    .nav-btn:disabled { opacity: 0.3; pointer-events: none; filter: grayscale(0.5); }
+    .nav-btn:disabled { 
+      opacity: 0.3; 
+      pointer-events: none !important; 
+      filter: grayscale(0.5); 
+    }
 
     .page-container {
       min-height: 280px;
@@ -522,6 +527,7 @@
       box-shadow: 0 8px 25px rgba(192, 57, 43, 0.5);
       z-index: 6;
       letter-spacing: 1px;
+      touch-action: manipulation;
     }
 
     .open-btn:hover {
@@ -533,7 +539,6 @@
     .open-btn:active { transform: translateX(-50%) scale(0.95); }
     .open-btn.hidden { opacity: 0; pointer-events: none; }
 
-    /* ===== ANSWER BOX - FIXED FOR KEYBOARD ===== */
     .answer-section {
       width: 100%;
       max-width: 400px;
@@ -595,6 +600,7 @@
       box-shadow: 0 8px 20px rgba(214, 40, 74, 0.4);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      z-index: 10;
     }
 
     .reply-btn:active { transform: scale(0.95); }
@@ -675,6 +681,7 @@
       margin-top: 0.1rem;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      z-index: 10;
     }
 
     .accept-btn:active { transform: scale(0.95); }
@@ -762,6 +769,7 @@
       box-shadow: 0 8px 25px rgba(192, 57, 43, 0.5);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      z-index: 10;
     }
 
     .restart-btn:active { transform: scale(0.95); }
@@ -839,7 +847,7 @@
       .page-body { font-size: 0.95rem; }
       .page-icon { font-size: 2.2rem; }
       .page-indicator { font-size: 0.7rem; padding: 0.2rem 0.7rem; }
-      .nav-btn { padding: 0.45rem 0.8rem; font-size: 0.75rem; min-width: 55px; }
+      .nav-btn { padding: 0.5rem 0.8rem; font-size: 0.75rem; min-width: 55px; }
       .nav-btn i { font-size: 0.75rem; }
       .nav-header { gap: 0.3rem; }
       .big-emoji { font-size: 3rem; }
@@ -869,7 +877,7 @@
       .book { padding: 0.6rem 0.4rem 0.8rem 0.4rem; }
       .nav-header { flex-wrap: wrap; justify-content: center; gap: 0.3rem; }
       .page-indicator { font-size: 0.6rem; padding: 0.15rem 0.6rem; }
-      .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.65rem; min-width: 50px; }
+      .nav-btn { padding: 0.45rem 0.6rem; font-size: 0.65rem; min-width: 50px; }
       .nav-btn i { font-size: 0.65rem; }
       .page-title { font-size: 1.1rem; }
       .page-body { font-size: 0.85rem; }
@@ -1063,8 +1071,6 @@
 
     // DOM refs
     const container = document.getElementById('pageContainer');
-    let prevBtn = document.getElementById('prevBtn');
-    let nextBtn = document.getElementById('nextBtn');
     const pageCounter = document.getElementById('pageCounter');
 
     let currentIndex = 0;
@@ -1145,6 +1151,58 @@
     document.getElementById('surpriseOverlay').addEventListener('click', function(e) {
       if (e.target === this) this.classList.remove('show');
     });
+
+    // ===== SIMPLE NAVIGATION FUNCTIONS =====
+    function goToPage(index) {
+      if (index < 0 || index >= totalPages) return;
+      currentIndex = index;
+      renderPage(currentIndex);
+    }
+
+    function handleNextClick() {
+      // If on letter page and letter not open
+      if (currentIndex === 0 && !isLetterOpen) {
+        const envelope = document.getElementById('envelope');
+        const openBtn = document.getElementById('openLetterBtn');
+        if (envelope && !envelope.classList.contains('open')) {
+          envelope.classList.add('open');
+          if (openBtn) openBtn.classList.add('hidden');
+          isLetterOpen = true;
+          setTimeout(function() {
+            if (currentIndex < totalPages - 1) {
+              goToPage(currentIndex + 1);
+            }
+          }, 500);
+          return;
+        }
+      }
+      
+      // If on last page
+      if (currentIndex === totalPages - 1) {
+        if (!flowersAccepted) {
+          const acceptBtn = document.getElementById('acceptBtn');
+          if (acceptBtn && !acceptBtn.classList.contains('accepted')) {
+            acceptBtn.style.animation = 'pulse 0.5s ease 3';
+            setTimeout(function() {
+              acceptBtn.style.animation = '';
+            }, 1500);
+          }
+          return;
+        }
+        return;
+      }
+      
+      // Normal navigation - go to next page
+      if (currentIndex < totalPages - 1) {
+        goToPage(currentIndex + 1);
+      }
+    }
+
+    function handlePrevClick() {
+      if (currentIndex > 0) {
+        goToPage(currentIndex - 1);
+      }
+    }
 
     // ===== RENDER PAGE =====
     function renderPage(index) {
@@ -1233,16 +1291,28 @@
       container.innerHTML = html;
       pageCounter.textContent = `${index+1} / ${totalPages}`;
       
-      // Get fresh button references
-      prevBtn = document.getElementById('prevBtn');
-      nextBtn = document.getElementById('nextBtn');
+      // Get button references
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
       
-      if (prevBtn) prevBtn.disabled = (index === 0);
+      if (prevBtn) {
+        prevBtn.disabled = (index === 0);
+        // Remove old listeners and add new ones
+        const newPrev = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+        newPrev.addEventListener('click', handlePrevClick);
+      }
       
-      if (isLastPage) {
-        if (nextBtn) nextBtn.disabled = !flowersAccepted;
-      } else {
-        if (nextBtn) nextBtn.disabled = false;
+      if (nextBtn) {
+        if (isLastPage) {
+          nextBtn.disabled = !flowersAccepted;
+        } else {
+          nextBtn.disabled = false;
+        }
+        // Remove old listeners and add new ones
+        const newNext = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNext, nextBtn);
+        newNext.addEventListener('click', handleNextClick);
       }
 
       // Letter open functionality
@@ -1251,20 +1321,27 @@
         const envelope = document.getElementById('envelope');
 
         if (openBtn && envelope) {
-          openBtn.addEventListener('click', function(e) {
+          // Remove old listeners
+          const newOpenBtn = openBtn.cloneNode(true);
+          openBtn.parentNode.replaceChild(newOpenBtn, openBtn);
+          
+          newOpenBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             envelope.classList.add('open');
-            openBtn.classList.add('hidden');
+            this.classList.add('hidden');
             isLetterOpen = true;
-            if (nextBtn) nextBtn.disabled = false;
+            const nxtBtn = document.getElementById('nextBtn');
+            if (nxtBtn) nxtBtn.disabled = false;
           });
 
           envelope.addEventListener('click', function(e) {
             if (!isLetterOpen && (e.target === envelope || e.target.closest('.envelope-body') || e.target.closest('.envelope-flap'))) {
               envelope.classList.add('open');
-              openBtn.classList.add('hidden');
+              const openBtnEl = document.getElementById('openLetterBtn');
+              if (openBtnEl) openBtnEl.classList.add('hidden');
               isLetterOpen = true;
-              if (nextBtn) nextBtn.disabled = false;
+              const nxtBtn = document.getElementById('nextBtn');
+              if (nxtBtn) nxtBtn.disabled = false;
             }
           });
         }
@@ -1277,7 +1354,7 @@
         const feedback = document.getElementById('replyFeedback');
 
         if (replyBtn && answerInput) {
-          // Remove any existing listeners
+          // Remove old listeners
           const newReplyBtn = replyBtn.cloneNode(true);
           replyBtn.parentNode.replaceChild(newReplyBtn, replyBtn);
           
@@ -1391,114 +1468,19 @@
           }
         }, 50);
       }
-
-      // Re-attach navigation events after render
-      setTimeout(attachNavEvents, 100);
       
       document.querySelector('.book').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function goToPage(index) {
-      if (index < 0 || index >= totalPages) return;
-      currentIndex = index;
-      renderPage(currentIndex);
-    }
-
-    // ===== NAVIGATION EVENTS =====
-    function handleNextClick(e) {
-      if (e) { 
-        e.preventDefault(); 
-        e.stopPropagation(); 
-      }
-      
-      // If on letter page and letter not open
-      if (currentIndex === 0 && !isLetterOpen) {
-        const envelope = document.getElementById('envelope');
-        const openBtn = document.getElementById('openLetterBtn');
-        if (envelope && !envelope.classList.contains('open')) {
-          envelope.classList.add('open');
-          if (openBtn) openBtn.classList.add('hidden');
-          isLetterOpen = true;
-          const nxtBtn = document.getElementById('nextBtn');
-          if (nxtBtn) nxtBtn.disabled = false;
-          setTimeout(function() {
-            if (currentIndex < totalPages - 1) {
-              goToPage(currentIndex + 1);
-            }
-          }, 500);
-          return;
-        }
-      }
-      
-      // If on last page
-      if (currentIndex === totalPages - 1) {
-        if (!flowersAccepted) {
-          const acceptBtn = document.getElementById('acceptBtn');
-          if (acceptBtn && !acceptBtn.classList.contains('accepted')) {
-            acceptBtn.style.animation = 'pulse 0.5s ease 3';
-            setTimeout(function() {
-              acceptBtn.style.animation = '';
-            }, 1500);
-          }
-          return;
-        }
-        return;
-      }
-      
-      // Normal navigation - go to next page
-      if (currentIndex < totalPages - 1) {
-        goToPage(currentIndex + 1);
-      }
-    }
-
-    function handlePrevClick(e) {
-      if (e) { e.preventDefault(); e.stopPropagation(); }
-      if (currentIndex > 0) {
-        goToPage(currentIndex - 1);
-      }
-    }
-
-    function attachNavEvents() {
-      prevBtn = document.getElementById('prevBtn');
-      nextBtn = document.getElementById('nextBtn');
-      
-      if (prevBtn) {
-        const newPrev = prevBtn.cloneNode(true);
-        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
-        newPrev.addEventListener('click', handlePrevClick);
-        newPrev.addEventListener('touchstart', function(e) {
-          // Only prevent if it's a touch event
-          if (e.type === 'touchstart') {
-            e.preventDefault();
-          }
-          handlePrevClick(e);
-        }, { passive: false });
-        prevBtn = newPrev;
-      }
-      
-      if (nextBtn) {
-        const newNext = nextBtn.cloneNode(true);
-        nextBtn.parentNode.replaceChild(newNext, nextBtn);
-        newNext.addEventListener('click', handleNextClick);
-        newNext.addEventListener('touchstart', function(e) {
-          if (e.type === 'touchstart') {
-            e.preventDefault();
-          }
-          handleNextClick(e);
-        }, { passive: false });
-        nextBtn = newNext;
-      }
     }
 
     // Keyboard support
     document.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowLeft') { 
         e.preventDefault();
-        handlePrevClick(e);
+        handlePrevClick();
       }
       else if (e.key === 'ArrowRight') { 
         e.preventDefault();
-        handleNextClick(e);
+        handleNextClick();
       }
     });
 
@@ -1513,9 +1495,9 @@
       const diff = touchStartX - e.changedTouches[0].screenX;
       if (Math.abs(diff) > 40) {
         if (diff > 0) {
-          handleNextClick(e);
+          handleNextClick();
         } else {
-          handlePrevClick(e);
+          handlePrevClick();
         }
       }
     }, { passive: true });
