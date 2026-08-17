@@ -257,7 +257,7 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       position: relative;
-      z-index: 20;
+      z-index: 999 !important;
       pointer-events: auto !important;
     }
 
@@ -600,7 +600,8 @@
       box-shadow: 0 8px 20px rgba(214, 40, 74, 0.4);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      z-index: 10;
+      z-index: 999 !important;
+      pointer-events: auto !important;
     }
 
     .reply-btn:active { transform: scale(0.95); }
@@ -642,7 +643,8 @@
       box-shadow: 0 8px 25px rgba(214, 40, 74, 0.4);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      z-index: 10;
+      z-index: 999 !important;
+      pointer-events: auto !important;
       width: 100%;
       justify-content: center;
     }
@@ -650,7 +652,6 @@
     .mobile-next-btn:active { transform: scale(0.95); }
     .mobile-next-btn:disabled { opacity: 0.4; pointer-events: none; }
 
-    /* Mobile only - show extra next button */
     @media (max-width: 768px) {
       .mobile-next-section {
         display: flex !important;
@@ -722,12 +723,12 @@
       margin-top: 0.1rem;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      z-index: 10;
+      z-index: 999 !important;
+      pointer-events: auto !important;
     }
 
     .accept-btn:active { transform: scale(0.95); }
     .accept-btn.accepted { opacity: 0.7; cursor: default; background: #4CAF50; }
-    .accept-btn.accepted:hover { transform: scale(1); background: #4CAF50; }
 
     .accept-feedback {
       color: #ffb0b0;
@@ -777,6 +778,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease, transform 0.3s ease;
+      z-index: 999 !important;
     }
 
     .continue-btn.show {
@@ -810,7 +812,8 @@
       box-shadow: 0 8px 25px rgba(192, 57, 43, 0.5);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      z-index: 10;
+      z-index: 999 !important;
+      pointer-events: auto !important;
     }
 
     .restart-btn:active { transform: scale(0.95); }
@@ -1195,14 +1198,19 @@
       if (e.target === this) this.classList.remove('show');
     });
 
-    // ===== SIMPLE NAVIGATION FUNCTIONS =====
+    // ===== NAVIGATION FUNCTIONS =====
     function goToPage(index) {
       if (index < 0 || index >= totalPages) return;
       currentIndex = index;
       renderPage(currentIndex);
     }
 
-    function handleNextClick() {
+    function handleNextClick(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
       // If on letter page and letter not open
       if (currentIndex === 0 && !isLetterOpen) {
         const envelope = document.getElementById('envelope');
@@ -1241,7 +1249,11 @@
       }
     }
 
-    function handlePrevClick() {
+    function handlePrevClick(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       if (currentIndex > 0) {
         goToPage(currentIndex - 1);
       }
@@ -1285,7 +1297,7 @@
         `;
       }
 
-      // Mobile next button HTML - for ALL pages except last
+      // Mobile next button - for ALL pages except last
       let mobileNextHtml = '';
       if (!isLastPage) {
         mobileNextHtml = `
@@ -1348,36 +1360,9 @@
       container.innerHTML = html;
       pageCounter.textContent = `${index+1} / ${totalPages}`;
       
-      // Get button references
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const mobileNextBtn = document.getElementById('mobileNextBtn');
+      // Attach ALL button events with both click and touch
+      attachButtonEvents(index, isLastPage);
       
-      if (prevBtn) {
-        prevBtn.disabled = (index === 0);
-        const newPrev = prevBtn.cloneNode(true);
-        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
-        newPrev.addEventListener('click', handlePrevClick);
-      }
-      
-      if (nextBtn) {
-        if (isLastPage) {
-          nextBtn.disabled = !flowersAccepted;
-        } else {
-          nextBtn.disabled = false;
-        }
-        const newNext = nextBtn.cloneNode(true);
-        nextBtn.parentNode.replaceChild(newNext, nextBtn);
-        newNext.addEventListener('click', handleNextClick);
-      }
-
-      // Mobile Next Button - for ALL pages except last
-      if (mobileNextBtn) {
-        const newMobileNext = mobileNextBtn.cloneNode(true);
-        mobileNextBtn.parentNode.replaceChild(newMobileNext, mobileNextBtn);
-        newMobileNext.addEventListener('click', handleNextClick);
-      }
-
       // Letter open functionality
       if (isLetterPage) {
         const openBtn = document.getElementById('openLetterBtn');
@@ -1533,15 +1518,61 @@
       document.querySelector('.book').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    // ===== ATTACH BUTTON EVENTS =====
+    function attachButtonEvents(index, isLastPage) {
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const mobileNextBtn = document.getElementById('mobileNextBtn');
+      
+      // Prev Button
+      if (prevBtn) {
+        prevBtn.disabled = (index === 0);
+        const newPrev = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+        newPrev.addEventListener('click', handlePrevClick);
+        newPrev.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          handlePrevClick(e);
+        }, { passive: false });
+      }
+      
+      // Next Button (Top)
+      if (nextBtn) {
+        if (isLastPage) {
+          nextBtn.disabled = !flowersAccepted;
+        } else {
+          nextBtn.disabled = false;
+        }
+        const newNext = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNext, nextBtn);
+        newNext.addEventListener('click', handleNextClick);
+        newNext.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          handleNextClick(e);
+        }, { passive: false });
+      }
+
+      // Mobile Next Button
+      if (mobileNextBtn) {
+        const newMobileNext = mobileNextBtn.cloneNode(true);
+        mobileNextBtn.parentNode.replaceChild(newMobileNext, mobileNextBtn);
+        newMobileNext.addEventListener('click', handleNextClick);
+        newMobileNext.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          handleNextClick(e);
+        }, { passive: false });
+      }
+    }
+
     // Keyboard support
     document.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowLeft') { 
         e.preventDefault();
-        handlePrevClick();
+        handlePrevClick(e);
       }
       else if (e.key === 'ArrowRight') { 
         e.preventDefault();
-        handleNextClick();
+        handleNextClick(e);
       }
     });
 
@@ -1556,9 +1587,9 @@
       const diff = touchStartX - e.changedTouches[0].screenX;
       if (Math.abs(diff) > 40) {
         if (diff > 0) {
-          handleNextClick();
+          handleNextClick(e);
         } else {
-          handlePrevClick();
+          handlePrevClick(e);
         }
       }
     }, { passive: true });
@@ -1570,7 +1601,7 @@
       const colors = ['#ff2d55', '#ff4d6d', '#ff6b81', '#ff4757'];
       
       let heartCount = 0;
-      const maxHearts = 15;
+      const maxHearts = 12;
       
       function addHeart() {
         if (heartCount >= maxHearts) return;
@@ -1595,11 +1626,11 @@
         }, 22000);
       }
 
-      for (let i = 0; i < 6; i++) {
-        setTimeout(addHeart, i * 200);
+      for (let i = 0; i < 5; i++) {
+        setTimeout(addHeart, i * 300);
       }
 
-      setInterval(addHeart, 1200);
+      setInterval(addHeart, 1500);
     }
 
     createFloatingHearts();
